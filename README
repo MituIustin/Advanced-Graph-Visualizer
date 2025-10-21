@@ -1,0 +1,21 @@
+## Working in progress ...
+
+# Backend
+
+```sh
+py -m uvicorn main:app --reload
+```
+
+# Frontend
+
+```sh
+npm run dev
+```
+
+# Usefull commands :)
+
+```sh
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+pip install -m requirements.txt
+npm install
+```

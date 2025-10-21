@@ -1,0 +1,224 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36" version="28.2.7">
+  <diagram name="Page-1" id="uGcQFHAI4GSlOA4Aewoo">
+    <mxGraphModel dx="1188" dy="648" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-50" value="Start" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="340" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-51" value="Utilizator autentificat?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="315" width="100" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-53" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="Pfon82NVZABm7Eqx-mhg-50" target="Pfon82NVZABm7Eqx-mhg-51">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="360" y="370" as="sourcePoint" />
+            <mxPoint x="410" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-55" value="" style="endArrow=none;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="Pfon82NVZABm7Eqx-mhg-51">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="360" y="370" as="sourcePoint" />
+            <mxPoint x="360" y="440" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="250" y="440" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-95" value="NU" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="Pfon82NVZABm7Eqx-mhg-55">
+          <mxGeometry x="0.2276" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-59" value="Creeaza graf" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="450" y="370" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-60" value="Editeaza graf" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="660" y="420" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-61" value="Importa graf" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="450" y="420" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-62" value="Genereaza graf" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="450" y="470" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-66" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="Pfon82NVZABm7Eqx-mhg-59">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="360" y="440" as="sourcePoint" />
+            <mxPoint x="510" y="420" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="360" y="385" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-67" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="Pfon82NVZABm7Eqx-mhg-62">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="360" y="440" as="sourcePoint" />
+            <mxPoint x="520" y="420" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="360" y="485" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-68" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.003;entryY=0.666;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" target="Pfon82NVZABm7Eqx-mhg-61">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="360" y="440" as="sourcePoint" />
+            <mxPoint x="530" y="495" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="410" y="440" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-71" value="" style="endArrow=none;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="Pfon82NVZABm7Eqx-mhg-59">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="630" y="410" as="sourcePoint" />
+            <mxPoint x="620" y="430" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="620" y="385" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-73" value="" style="endArrow=none;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570" y="484.84000000000003" as="sourcePoint" />
+            <mxPoint x="620" y="430" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="620" y="485" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-75" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="Pfon82NVZABm7Eqx-mhg-61" target="Pfon82NVZABm7Eqx-mhg-60">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="600" y="460" as="sourcePoint" />
+            <mxPoint x="650" y="410" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-76" value="Alege algoritm" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="840" y="420" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-77" value="Personalizeaza animatie" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="420" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-78" value="Vizualizare animatie" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="370" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-79" value="Animatie pas cu pas" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="470" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-80" value="Exporta graf" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1430" y="420" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-81" value="Salvare graf" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1430" y="340" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-82" value="Stop" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1640" y="380" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-83" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="Pfon82NVZABm7Eqx-mhg-60" target="Pfon82NVZABm7Eqx-mhg-76">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="840" y="460" as="sourcePoint" />
+            <mxPoint x="890" y="410" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-84" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="960" y="434.8" as="sourcePoint" />
+            <mxPoint x="1020" y="434.8" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-85" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="Pfon82NVZABm7Eqx-mhg-78">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1170" y="440" as="sourcePoint" />
+            <mxPoint x="1190" y="440" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1170" y="385" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-86" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="Pfon82NVZABm7Eqx-mhg-79">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1170" y="440" as="sourcePoint" />
+            <mxPoint x="1250" y="420" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1170" y="485" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-87" value="" style="endArrow=none;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="Pfon82NVZABm7Eqx-mhg-77">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1140" y="490" as="sourcePoint" />
+            <mxPoint x="1170" y="435" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-88" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="Pfon82NVZABm7Eqx-mhg-79" target="Pfon82NVZABm7Eqx-mhg-81">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1280" y="460" as="sourcePoint" />
+            <mxPoint x="1330" y="410" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1380" y="485" />
+              <mxPoint x="1380" y="355" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-89" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="Pfon82NVZABm7Eqx-mhg-80">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1380" y="435" as="sourcePoint" />
+            <mxPoint x="1330" y="410" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-90" value="" style="endArrow=none;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="Pfon82NVZABm7Eqx-mhg-78">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1330" y="470" as="sourcePoint" />
+            <mxPoint x="1380" y="385" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-91" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=-0.078;entryY=0.467;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="Pfon82NVZABm7Eqx-mhg-51" target="Pfon82NVZABm7Eqx-mhg-94">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="340" y="410" as="sourcePoint" />
+            <mxPoint x="310" y="270" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="250" y="274" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-94" value="DA" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="310" y="260" width="20" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-97" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="Pfon82NVZABm7Eqx-mhg-94">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="400" as="sourcePoint" />
+            <mxPoint x="330" y="440" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-98" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.428;entryY=-0.037;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="Pfon82NVZABm7Eqx-mhg-94" target="Pfon82NVZABm7Eqx-mhg-81">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="540" y="360" as="sourcePoint" />
+            <mxPoint x="1480" y="280" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1480" y="275" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-99" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="Pfon82NVZABm7Eqx-mhg-80" target="Pfon82NVZABm7Eqx-mhg-82">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1530" y="410" as="sourcePoint" />
+            <mxPoint x="1580" y="360" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1600" y="435" />
+              <mxPoint x="1600" y="400" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Pfon82NVZABm7Eqx-mhg-100" value="" style="endArrow=none;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="Pfon82NVZABm7Eqx-mhg-81">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1530" y="410" as="sourcePoint" />
+            <mxPoint x="1600" y="400" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1600" y="355" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

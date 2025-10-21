@@ -1,0 +1,6 @@
+
+# ignore local database
+*.db 
+
+# ignore python cache stuff
+*.pyc
