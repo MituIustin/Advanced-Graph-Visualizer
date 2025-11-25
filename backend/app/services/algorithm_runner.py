@@ -1,0 +1,45 @@
+import uuid
+from typing import Dict, List
+from app.schemas.algorithm import (
+  AlgorithmRunRequest,
+  StepHighlight,
+  AlgorithmName,
+)
+
+# all algorithms implemented
+from app.services.algorithms.bfs import fake_bfs
+from app.services.algorithms.dfs import fake_dfs
+
+# possibly we will save this in the actual DB
+# key: run_id, value: steps
+RUNS: Dict[str, List[StepHighlight]] = {}
+
+def create_algorithm_run(req: AlgorithmRunRequest) -> str:
+    if req.algorithm == AlgorithmName.bfs:
+        steps = fake_bfs(req)
+    elif req.algorithm == AlgorithmName.dfs:
+        steps = fake_dfs(req)
+    else:
+        print("ERROR: this algorithm is not implemented.")
+
+    run_id = str(uuid.uuid4())
+    RUNS[run_id] = steps
+    return run_id
+
+
+def get_step(run_id: str, step_index: int) -> StepHighlight:
+  if run_id not in RUNS:
+    raise KeyError("Run not found")
+
+  steps = RUNS[run_id]
+  if step_index < 0 or step_index >= len(steps):
+    raise IndexError("Step out of range")
+
+  return steps[step_index]
+
+
+def get_run_total_steps(run_id: str) -> int:
+  if run_id not in RUNS:
+    raise KeyError("Run not found")
+
+  return len(RUNS[run_id])

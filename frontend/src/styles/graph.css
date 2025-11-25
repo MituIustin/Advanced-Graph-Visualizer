@@ -1,0 +1,220 @@
+.panel {
+  background: rgba(15, 23, 42, 0.95);
+  border-radius: 12px;
+  padding: 14px 16px;
+  border: 1px solid #1f2937;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.6);
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-left {
+  overflow: hidden;
+}
+
+.panel-left h2,
+.panel-right h2 {
+  font-size: 25px;
+  margin-bottom: 8px;
+  color: #e5e7eb;
+}
+
+.input-method-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.input-method-row label {
+  font-size: 14px;
+  color: #cbd5f5;
+}
+
+.input-method-row select {
+  padding: 4px 8px;
+  font-size: 13px;
+  border-radius: 6px;
+  border: 1px solid #1f2937;
+  background: #020617;
+  color: #e5e7eb;
+}
+
+.panel-center {
+  display: flex;
+  flex-direction: column;
+}
+
+.graph-type-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.graph-type-button {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #1f2937;
+  background: #020617;
+  font-size: 13px;
+  color: #e5e7eb;
+  min-width: 88px;
+  text-align: center;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease,
+    transform 0.1s ease;
+}
+
+.graph-type-button:hover {
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.45);
+}
+
+.graph-type-button.active {
+  background: #3b82f6;
+  border-color: #60a5fa;
+  color: #f9fafb;
+}
+
+.graph-canvas-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+.canvas-instructions {
+  font-size: 14px;
+  color: #9ca3af;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.canvas-instructions span {
+  color: #e5e7eb;
+  font-weight: 500;
+}
+
+.panel-right p {
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: #9ca3af;
+}
+
+.algo-section {
+  margin-top: 8px;
+}
+
+.algo-section h3 {
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: #e5e7eb;
+}
+
+.algo-section ul {
+  margin-left: 16px;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.panel-left textarea {
+  background: #020617;
+  color: #e5e7eb;
+  border: 1px solid #1f2937;
+  border-radius: 8px;
+  padding: 8px;
+  resize: vertical;
+  font-size: 14px;
+}
+
+.panel-left textarea {
+  scrollbar-width: thin;
+  scrollbar-color: #3b82f6 #020617;
+}
+
+.panel-left textarea::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.panel-left textarea::-webkit-scrollbar-track {
+  background: #020617;
+  border-radius: 8px;
+}
+
+.panel-left textarea::-webkit-scrollbar-thumb {
+  background: #1f2937;
+  border-radius: 8px;
+  border: 1px solid #020617;
+}
+
+.panel-left textarea::-webkit-scrollbar-thumb:hover {
+  background: #3b82f6;
+}
+
+.panel-left textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.panel-left button {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid #1d4ed8;
+  background: #2563eb;
+  color: #f9fafb;
+  font-size: 16px;
+  margin-top: 8px;
+  align-self: center;
+  transition: background 0.15s ease, transform 0.1s ease,
+    box-shadow 0.15s ease;
+}
+
+.panel-left button:hover {
+  background: #1d4ed8;
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.45);
+  transform: translateY(-1px);
+}
+
+.panel-left-export-row {
+  margin-top: auto;
+  display: flex;
+  justify-content: center;
+  padding-top: 12px;
+  border-top: 1px solid #1f2937;
+}
+
+.panel-left-export-row .export-button {
+  padding: 8px 20px;
+  border-radius: 999px;
+  border: 1px solid #0ea5e9;
+  background: #0284c7;
+  color: #f9fafb;
+  font-size: 25px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: background 0.15s ease, transform 0.1s ease,
+    box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.panel-left-export-row .export-button:hover {
+  background: #0ea5e9;
+  border-color: #38bdf8;
+  box-shadow: 0 12px 30px rgba(14, 165, 233, 0.45);
+  transform: translateY(-1px);
+}
+
+.panel-left label {
+  font-size: 13px;
+  color: #cbd5f5;
+}
+
+.panel-left .error {
+  margin-top: 8px;
+  color: #f97373;
+  font-size: 12px;
+}
