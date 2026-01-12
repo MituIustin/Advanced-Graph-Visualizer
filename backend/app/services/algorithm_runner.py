@@ -11,6 +11,7 @@ from app.services.algorithms.bfs import fake_bfs
 from app.services.algorithms.dfs import fake_dfs
 from app.services.algorithms.kruskal import fake_kruskal
 from app.services.algorithms.dijkstra import fake_dijkstra
+from app.services.algorithms.prim import fake_prim
 
 # possibly we will save this in the actual DB
 # key: run_id, value: steps
@@ -25,6 +26,8 @@ def create_algorithm_run(req: AlgorithmRunRequest) -> str:
         steps = fake_kruskal(req)
     elif req.algorithm == AlgorithmName.dijkstra:
         steps = fake_dijkstra(req)
+    elif req.algorithm == AlgorithmName.prim:
+        steps = fake_prim(req)    
     else:
         print("ERROR: this algorithm is not implemented.")
 

@@ -59,7 +59,7 @@ const GraphInputPanel: React.FC<Props> = ({
   const ids = [...new Set(nodes.map((n) => n.id))].sort((a, b) => a - b);
 
   // NEW: Treat as undirected when Kruskal is selected in weighted mode
-  const treatAsUndirected = graphType === "weighted" && selectedAlgorithm === "kruskal";
+  const treatAsUndirected = graphType === "weighted" && (selectedAlgorithm === "kruskal" || selectedAlgorithm === "prim");
 
   if (mode === "edge-list") {
     const lines: string[] = [];

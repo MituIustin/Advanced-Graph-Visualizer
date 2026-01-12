@@ -202,12 +202,12 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
       const tangentAngle = Math.atan2(endY - controlY, endX - controlX);
       
       // NEW: Only draw arrowhead if not Kruskal selected in weighted mode
-      if (!(graphType === "weighted" && selectedAlgorithm === "kruskal")) {
+      if (!(graphType === "weighted" && (selectedAlgorithm === "kruskal" || selectedAlgorithm === "prim"))) {
         drawArrowHead(endX, endY, tangentAngle);
       }
     } else {
       // NEW: Only draw arrowhead if not Kruskal selected in weighted mode
-      if (!(graphType === "weighted" && selectedAlgorithm === "kruskal")) {
+      if (!(graphType === "weighted" && (selectedAlgorithm === "kruskal" || selectedAlgorithm === "prim"))) {
         drawArrowHead(endX, endY, angleAB);
       }
     }
@@ -267,12 +267,12 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
       const tangentAngle = Math.atan2(startY - controlY, startX - controlX);
       
       // NEW: Only draw arrowhead if not Kruskal selected in weighted mode
-      if (!(graphType === "weighted" && selectedAlgorithm === "kruskal")) {
+      if (!(graphType === "weighted" && (selectedAlgorithm === "kruskal" || selectedAlgorithm === "prim"))) {
         drawArrowHead(startX, startY, tangentAngle);
       }
     } else {
       // NEW: Only draw arrowhead if not Kruskal selected in weighted mode
-      if (!(graphType === "weighted" && selectedAlgorithm === "kruskal")) {
+      if (!(graphType === "weighted" && (selectedAlgorithm === "kruskal" || selectedAlgorithm === "prim"))) {
         drawArrowHead(startX, startY, angleBA);
       }
     }
