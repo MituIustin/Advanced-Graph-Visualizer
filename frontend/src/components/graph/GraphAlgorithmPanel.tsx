@@ -41,8 +41,9 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
   onRunningChange,  // NEW
   onAlgorithmChange,
 }) => {
-  const [algorithm, setAlgorithm] = useState<"bfs" | "dfs" | "kruskal" | "dijkstra" | "prim" | "bellmanford">("bfs");
+  const [algorithm, setAlgorithm] = useState<"bfs" | "dfs" | "kruskal" | "dijkstra" | "prim" | "bellmanford" | "astar">("bfs");
   const [startNodeId, setStartNodeId] = useState<number | null>(null);
+  const [targetNodeId, setTargetNodeId] = useState<number | null>(null);
   const [runId, setRunId] = useState<string | null>(null);
   const [totalSteps, setTotalSteps] = useState<number>(0);
   const [currentStep, setCurrentStep] = useState<number | null>(null);
@@ -51,9 +52,10 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
   const [error, setError] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState<boolean>(false);  // NEW
   
-  const requiresWeighted = (algorithm === "kruskal" || algorithm === "dijkstra" || algorithm === "prim" || algorithm === "bellmanford");
+  const requiresWeighted = (algorithm === "kruskal" || algorithm === "dijkstra" || algorithm === "prim" || algorithm === "bellmanford" || algorithm === "astar");
   const isWeighted = graphType === "weighted" || graphType.includes("weighted");
-  const requiresStartNode = (algorithm === "dijkstra" || algorithm === "bfs" || algorithm === "dfs" || algorithm === "prim" || algorithm === "bellmanford");
+  const requiresStartNode = (algorithm === "dijkstra" || algorithm === "bfs" || algorithm === "dfs" || algorithm === "prim" || algorithm === "bellmanford" || algorithm === "astar");
+  const requiresTargetNode = (algorithm === "astar");  // NEW
   const hasNegativeWeights = edges.some(e => e.weight != null && e.weight < 0);
 
   const hasBidirectionalEdges = () => {
@@ -61,7 +63,7 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
     return edges.some(e => edgeSet.has(`${e.to}-${e.from}`));
   };
 
-  const handleAlgorithmChange = (newAlgorithm: "bfs" | "dfs" | "kruskal" | "dijkstra" | "prim" | "bellmanford") => {
+  const handleAlgorithmChange = (newAlgorithm: "bfs" | "dfs" | "kruskal" | "dijkstra" | "prim" | "bellmanford" | "astar") => {
     setAlgorithm(newAlgorithm);
     onAlgorithmChange(newAlgorithm);
   };
@@ -69,10 +71,19 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
   const API_BASE = "http://localhost:8000";
 
   useEffect(() => {
-    if (nodes.length > 0 && (startNodeId === null || !nodes.find(n => n.id === startNodeId))) {
-      setStartNodeId(nodes[0].id);
-    }
-  }, [nodes, startNodeId]);
+  if (!nodes.length) return;
+
+  const nodeIds = nodes.map(n => n.id);
+
+  if (!nodeIds.includes(startNodeId)) {
+    setStartNodeId(nodes[0].id);
+  }
+
+  if (requiresTargetNode && !nodeIds.includes(targetNodeId)) {
+    setTargetNodeId(nodes[nodes.length - 1].id);
+  }
+}, [nodes, startNodeId, targetNodeId, requiresTargetNode]);
+
 
   const resetHighlights = () => {
     onHighlightChange([], [], [], []);
@@ -127,7 +138,7 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
       const body = {
         algorithm,
         graph_type: graphType,
-        nodes: nodes.map((n) => ({ id: n.id })),
+        nodes: nodes.map((n) => ({ id: n.id, x: n.x, y: n.y })),  // MODIFIED: include x, y for heuristic
         edges: edges.map((e) => ({
           id: e.id,
           from_node: e.from,
@@ -135,7 +146,7 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
           weight: e.weight ?? null,
         })),
         start_node_id: startNodeId ?? nodes[0]?.id ?? null,
-        target_node_id: null,
+        target_node_id: requiresTargetNode ? (targetNodeId ?? nodes[nodes.length - 1]?.id ?? null) : null,  // MODIFIED
       };
 
       const resp = await fetch(`${API_BASE}/api/algorithms/run`, {
@@ -198,7 +209,8 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
                      (requiresWeighted && !isWeighted) ||
                      (algorithm === "dijkstra" && hasNegativeWeights) ||
                      (algorithm === "kruskal" && hasBidirectionalEdges()) ||
-                     (algorithm === "prim" && hasBidirectionalEdges());  
+                     (algorithm === "prim" && hasBidirectionalEdges()) ||
+                     (algorithm === "astar" && hasNegativeWeights);  
 
   const disableNav = !runId || totalSteps === 0 || isLoading;
   return (
@@ -213,8 +225,12 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
       ? "Prim's algorithm requires a weighted graph."
       : algorithm === "prim" && hasBidirectionalEdges()
       ? "Prim's algorithm requires undirected edges. Remove one direction from each bidirectional edge pair."
-      : algorithm === "bellmanford" && !isWeighted  // ADD
-      ? "Bellman-Ford algorithm requires a weighted graph."  // ADD
+      : algorithm === "bellmanford" && !isWeighted
+      ? "Bellman-Ford algorithm requires a weighted graph."
+      : algorithm === "astar" && !isWeighted  // ADD
+      ? "A* algorithm requires a weighted graph."  // ADD
+      : algorithm === "astar" && hasNegativeWeights  // ADD
+      ? "A* algorithm does not work well with negative edge weights."  // ADD
       : algorithm === "dijkstra" && !isWeighted
       ? "Dijkstra's algorithm requires a weighted graph with only positive weights."
       : algorithm === "dijkstra" && hasNegativeWeights
@@ -229,7 +245,7 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
         <select
           className="algo-panel-select"
           value={algorithm}
-          onChange={(e) => handleAlgorithmChange(e.target.value as "bfs" | "dfs" | "kruskal" | "dijkstra" | "prim" | "bellmanford")}
+          onChange={(e) => handleAlgorithmChange(e.target.value as "bfs" | "dfs" | "kruskal" | "dijkstra" | "prim" | "bellmanford" | "astar")}
           disabled={isRunning}  // NEW
         >
           <option value="bfs">BFS</option>
@@ -238,6 +254,7 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
           <option value="dijkstra">Dijkstra's algorithm</option>
           <option value="prim">Prim's algorithm</option>
           <option value="bellmanford">Bellman-Ford algorithm</option>
+          <option value="astar">A* algorithm</option>
         </select>
       </div>
 
@@ -250,6 +267,25 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
             value={startNodeId ?? ""}
             onChange={(e) => setStartNodeId(Number(e.target.value))}
             disabled={isRunning}  // NEW
+          >
+            {nodes.map((node) => (
+              <option key={node.id} value={node.id}>
+                Node {node.id}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Target node selector - NEW */}
+      {requiresTargetNode && nodes.length > 0 && (
+        <div className="algo-panel-selector-row">
+          <span>Target Node:</span>
+          <select
+            className="algo-panel-select"
+            value={targetNodeId ?? ""}
+            onChange={(e) => setTargetNodeId(Number(e.target.value))}
+            disabled={isRunning}
           >
             {nodes.map((node) => (
               <option key={node.id} value={node.id}>

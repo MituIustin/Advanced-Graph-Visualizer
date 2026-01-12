@@ -13,6 +13,7 @@ from app.services.algorithms.kruskal import fake_kruskal
 from app.services.algorithms.dijkstra import fake_dijkstra
 from app.services.algorithms.prim import fake_prim
 from app.services.algorithms.bellmanford import fake_bellman_ford
+from app.services.algorithms.astar import fake_astar
 
 # possibly we will save this in the actual DB
 # key: run_id, value: steps
@@ -30,7 +31,9 @@ def create_algorithm_run(req: AlgorithmRunRequest) -> str:
     elif req.algorithm == AlgorithmName.prim:
         steps = fake_prim(req)
     elif req.algorithm == AlgorithmName.bellmanford:
-        steps = fake_bellman_ford(req)        
+        steps = fake_bellman_ford(req)      
+    elif req.algorithm == AlgorithmName.astar:
+        steps = fake_astar(req)   
     else:
         print("ERROR: this algorithm is not implemented.")
 

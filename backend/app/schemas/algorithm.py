@@ -14,6 +14,7 @@ class AlgorithmName(str, Enum):
     kruskal = "kruskal"
     prim = "prim"
     bellmanford = "bellmanford"
+    astar = "astar"
 
 class Node(BaseModel):
     id: int
