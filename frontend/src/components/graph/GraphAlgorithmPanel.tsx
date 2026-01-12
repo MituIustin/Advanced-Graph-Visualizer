@@ -37,13 +37,15 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
   edges,
   onHighlightChange,
 }) => {
-  const [algorithm, setAlgorithm] = useState<"bfs" | "dfs">("bfs");
+  const [algorithm, setAlgorithm] = useState<"bfs" | "dfs" | "kruskal">("bfs");
   const [runId, setRunId] = useState<string | null>(null);
   const [totalSteps, setTotalSteps] = useState<number>(0);
   const [currentStep, setCurrentStep] = useState<number | null>(null);
   const [status, setStatus] = useState<string>("Idle");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const requiresWeighted = algorithm === "kruskal";
+  const isWeighted = graphType === "weighted" || graphType.includes("weighted");
 
   const API_BASE = "http://localhost:8000";
 
@@ -151,14 +153,16 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
     await loadStep(runId, currentStep - 1);
   };
 
-  const disableRun = isLoading || nodes.length === 0;
+  const disableRun = isLoading || nodes.length === 0 || (requiresWeighted && !isWeighted);
   const disableNav = !runId || totalSteps === 0 || isLoading;
 
   return (
     <div className="algo-section">
-      <h3 className="algo-panel-title">Demo: BFS / DFS playback</h3>
+      <h3 className="algo-panel-title">Step-by-step visualization</h3>
       <p className="algo-panel-description">
-        This panel calls the backend fake BFS/DFS and highlights nodes/edges.
+      {algorithm === "kruskal" && !isWeighted
+        ? "Kruskal's algorithm requires a weighted graph."
+        : "Choose an algorithm and hit Run to display its steps on your created graph."}
       </p>
 
       {/* Algorithm selector */}
@@ -167,10 +171,11 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
         <select
           className="algo-panel-select"
           value={algorithm}
-          onChange={(e) => setAlgorithm(e.target.value as "bfs" | "dfs")}
+          onChange={(e) => setAlgorithm(e.target.value as "bfs" | "dfs" | "kruskal")}
         >
-          <option value="bfs">Fake BFS</option>
-          <option value="dfs">Fake DFS</option>
+          <option value="bfs">BFS</option>
+          <option value="dfs">DFS</option>
+          <option value="kruskal">KRUSKAL</option>
         </select>
       </div>
 

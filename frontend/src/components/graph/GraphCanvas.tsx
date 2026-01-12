@@ -203,7 +203,10 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
         ctx.lineWidth = isHighlighted ? 4 : isVisited ? 3.5 : 3;
         ctx.stroke();
 
-        if (graphType === "weighted" && e.weight != null) {
+        if (graphType === "weighted") {
+          if(e.weight == null){
+            e.weight = 0;
+          }
           const midX = (startX + endX) / 2;
           const midY = (startY + endY) / 2;
           drawWeightLabel(midX, midY, e.weight);

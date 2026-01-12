@@ -9,6 +9,7 @@ from app.schemas.algorithm import (
 # all algorithms implemented
 from app.services.algorithms.bfs import fake_bfs
 from app.services.algorithms.dfs import fake_dfs
+from app.services.algorithms.kruskal import fake_kruskal
 
 # possibly we will save this in the actual DB
 # key: run_id, value: steps
@@ -19,6 +20,8 @@ def create_algorithm_run(req: AlgorithmRunRequest) -> str:
         steps = fake_bfs(req)
     elif req.algorithm == AlgorithmName.dfs:
         steps = fake_dfs(req)
+    elif req.algorithm == AlgorithmName.kruskal:
+        steps = fake_kruskal(req)
     else:
         print("ERROR: this algorithm is not implemented.")
 
