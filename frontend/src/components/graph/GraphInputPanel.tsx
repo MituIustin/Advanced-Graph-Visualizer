@@ -95,7 +95,7 @@ const GraphInputPanel: React.FC<Props> = ({
         if (!neighborsMap.has(from)) neighborsMap.set(from, new Set());
         if (!neighborsMap.has(to)) neighborsMap.set(to, new Set());
 
-        if (graphType === "directed") {
+        if (graphType === "directed" || graphType === "weighted") {
           neighborsMap.get(from)!.add(to);
         } else {
           neighborsMap.get(from)!.add(to);
@@ -136,7 +136,7 @@ const GraphInputPanel: React.FC<Props> = ({
         val = e.weight;
       }
 
-      if (graphType === "directed") {
+      if (graphType === "directed" || graphType === "weighted") {
         matrix[i][j] = val;
       } else {
         matrix[i][j] = val;
@@ -188,8 +188,8 @@ const GraphInputPanel: React.FC<Props> = ({
     const newEdges: EdgeType[] = [];
     let edgeId = 1;
 
-    if (graphType === "undirected" || graphType === "weighted") {
-      // undirected / weighted -> treat matrix as symmetric
+    if (graphType === "undirected") {
+      // undirected -> treat matrix as symmetric
       // edge(i,j) exists if matrix[i][j] != 0 OR matrix[j][i] != 0
       for (let i = 0; i < n; i++) {
         for (let j = i + 1; j < n; j++) {
@@ -202,13 +202,12 @@ const GraphInputPanel: React.FC<Props> = ({
               id: edgeId++,
               from: ids[i],
               to: ids[j],
-              weight: graphType === "weighted" ? val : undefined,
             });
           }
         }
       }
-    } else if (graphType === "directed") {
-      // directed (unweighted) -> any nonzero becomes a directed edge
+    } else if (graphType === "directed" || graphType === "weighted") {
+      // directed/weighted -> any nonzero becomes a directed edge
       for (let i = 0; i < n; i++) {
         for (let j = 0; j < n; j++) {
           const val = matrix[i][j];
@@ -217,6 +216,7 @@ const GraphInputPanel: React.FC<Props> = ({
               id: edgeId++,
               from: ids[i],
               to: ids[j],
+              weight: graphType === "weighted" ? val : undefined,
             });
           }
         }
@@ -276,9 +276,14 @@ const GraphInputPanel: React.FC<Props> = ({
     const newEdges: EdgeType[] = [];
     let edgeId = 1;
 
-    if (graphType === "directed") {
+    if (graphType === "directed" || graphType === "weighted") {
       edgePairs.forEach(({ from, to }) => {
-        newEdges.push({ id: edgeId++, from, to });
+        newEdges.push({ 
+          id: edgeId++, 
+          from, 
+          to,
+          weight: graphType === "weighted" ? 1 : undefined
+        });
       });
     } else {
       const seen = new Set<string>();

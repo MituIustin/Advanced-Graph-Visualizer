@@ -93,128 +93,227 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
       ctx.fillText(label, boxX + boxWidth / 2, boxY + boxHeight / 2);
     };
 
-    // ===== EDGES =====
-    if (graphType === "directed") {
-      type PairInfo = {
-        aId: number;
-        bId: number;
-        hasAB: boolean;
-        hasBA: boolean;
-      };
+      // ===== EDGES =====
+      if (graphType === "directed" || graphType === "weighted") {
+        type PairInfo = {
+          aId: number;
+          bId: number;
+          hasAB: boolean;
+          hasBA: boolean;
+          edgeAB?: EdgeType;  // NEW: store the edge for weight display
+          edgeBA?: EdgeType;  // NEW: store the edge for weight display
+        };
 
-      const pairMap = new Map<string, PairInfo>();
+        const pairMap = new Map<string, PairInfo>();
 
-      edges.forEach((e) => {
-        const aId = Math.min(e.from, e.to);
-        const bId = Math.max(e.from, e.to);
-        const key = `${aId}-${bId}`;
+        edges.forEach((e) => {
+          const aId = Math.min(e.from, e.to);
+          const bId = Math.max(e.from, e.to);
+          const key = `${aId}-${bId}`;
 
-        let info = pairMap.get(key);
-        if (!info) {
-          info = { aId, bId, hasAB: false, hasBA: false };
-        }
-
-        if (e.from === aId && e.to === bId) {
-          info.hasAB = true;
-        } else if (e.from === bId && e.to === aId) {
-          info.hasBA = true;
-        }
-
-        pairMap.set(key, info);
-      });
-
-      pairMap.forEach((info) => {
-        const a = nodes.find((n) => n.id === info.aId);
-        const b = nodes.find((n) => n.id === info.bId);
-        if (!a || !b) return;
-
-        const dx = b.x - a.x;
-        const dy = b.y - a.y;
-        const len = Math.hypot(dx, dy) || 1;
-        const ux = dx / len;
-        const uy = dy / len;
-
-        const startX = a.x + ux * NODE_RADIUS;
-        const startY = a.y + uy * NODE_RADIUS;
-        const endX = b.x - ux * NODE_RADIUS;
-        const endY = b.y - uy * NODE_RADIUS;
-
-        const isAnyHighlighted = edges.some(
-          (e) =>
-            ((e.from === info.aId && e.to === info.bId) ||
-              (e.from === info.bId && e.to === info.aId)) &&
-            highlightEdges.includes(e.id)
-        );
-        const isAnyVisited = edges.some(
-          (e) =>
-            ((e.from === info.aId && e.to === info.bId) ||
-              (e.from === info.bId && e.to === info.aId)) &&
-            visitedEdges.includes(e.id)
-        );
-
-        ctx.beginPath();
-        ctx.moveTo(startX, startY);
-        ctx.lineTo(endX, endY);
-        ctx.strokeStyle = isAnyHighlighted
-          ? "#f97316"
-          : isAnyVisited
-          ? "#22c55e"
-          : "#3b82f6";
-        ctx.lineWidth = isAnyHighlighted ? 4 : isAnyVisited ? 3.5 : 3;
-        ctx.stroke();
-
-        const angleAB = Math.atan2(dy, dx);
-        const angleBA = angleAB + Math.PI;
-
-        if (info.hasAB) {
-          drawArrowHead(endX, endY, angleAB);
-        }
-        if (info.hasBA) {
-          drawArrowHead(startX, startY, angleBA);
-        }
-      });
-    } else {
-      // UNDIRECTED / WEIGHTED
-      edges.forEach((e) => {
-        const a = nodes.find((n) => n.id === e.from);
-        const b = nodes.find((n) => n.id === e.to);
-        if (!a || !b) return;
-
-        const dx = b.x - a.x;
-        const dy = b.y - a.y;
-        const len = Math.hypot(dx, dy) || 1;
-        const ux = dx / len;
-        const uy = dy / len;
-
-        const startX = a.x + ux * NODE_RADIUS;
-        const startY = a.y + uy * NODE_RADIUS;
-        const endX = b.x - ux * NODE_RADIUS;
-        const endY = b.y - uy * NODE_RADIUS;
-
-        const isHighlighted = highlightEdges.includes(e.id);
-        const isVisited = visitedEdges.includes(e.id);
-
-        ctx.beginPath();
-        ctx.moveTo(startX, startY);
-        ctx.lineTo(endX, endY);
-        ctx.strokeStyle = isHighlighted
-          ? "#f97316"
-          : isVisited
-          ? "#22c55e"
-          : "#3b82f6";
-        ctx.lineWidth = isHighlighted ? 4 : isVisited ? 3.5 : 3;
-        ctx.stroke();
-
-        if (graphType === "weighted") {
-          if(e.weight == null){
-            e.weight = 1;
+          let info = pairMap.get(key);
+          if (!info) {
+            info = { aId, bId, hasAB: false, hasBA: false };
           }
-          const midX = (startX + endX) / 2;
-          const midY = (startY + endY) / 2;
-          drawWeightLabel(midX, midY, e.weight);
-        }
-      });
+
+          if (e.from === aId && e.to === bId) {
+            info.hasAB = true;
+            info.edgeAB = e;  // NEW
+          } else if (e.from === bId && e.to === aId) {
+            info.hasBA = true;
+            info.edgeBA = e;  // NEW
+          }
+
+          pairMap.set(key, info);
+        });
+
+        pairMap.forEach((info) => {
+  const a = nodes.find((n) => n.id === info.aId);
+  const b = nodes.find((n) => n.id === info.bId);
+  if (!a || !b) return;
+
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const ux = dx / len;
+  const uy = dy / len;
+
+  const startX = a.x + ux * NODE_RADIUS;
+  const startY = a.y + uy * NODE_RADIUS;
+  const endX = b.x - ux * NODE_RADIUS;
+  const endY = b.y - uy * NODE_RADIUS;
+
+  const isAnyHighlighted = edges.some(
+    (e) =>
+      ((e.from === info.aId && e.to === info.bId) ||
+        (e.from === info.bId && e.to === info.aId)) &&
+      highlightEdges.includes(e.id)
+  );
+  const isAnyVisited = edges.some(
+    (e) =>
+      ((e.from === info.aId && e.to === info.bId) ||
+        (e.from === info.bId && e.to === info.aId)) &&
+      visitedEdges.includes(e.id)
+  );
+
+  const angleAB = Math.atan2(dy, dx);
+  const angleBA = angleAB + Math.PI;
+
+  // Check if we need to curve (both directions exist)
+  const shouldCurve = info.hasAB && info.hasBA;
+  const curveOffset = 40; // How much to curve
+
+  if (info.hasAB) {
+    const isHighlighted = info.edgeAB && highlightEdges.includes(info.edgeAB.id);
+    const isVisited = info.edgeAB && visitedEdges.includes(info.edgeAB.id);
+
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+
+    if (shouldCurve) {
+      // Draw curved line
+      const midX = (startX + endX) / 2;
+      const midY = (startY + endY) / 2;
+      // Control point perpendicular to the line
+      const controlX = midX - uy * curveOffset;
+      const controlY = midY + ux * curveOffset;
+      ctx.quadraticCurveTo(controlX, controlY, endX, endY);
+    } else {
+      // Draw straight line
+      ctx.lineTo(endX, endY);
     }
+
+    ctx.strokeStyle = isHighlighted
+      ? "#f97316"
+      : isVisited
+      ? "#22c55e"
+      : "#3b82f6";
+    ctx.lineWidth = isHighlighted ? 4 : isVisited ? 3.5 : 3;
+    ctx.stroke();
+
+    // Draw arrow head at the end
+    if (shouldCurve) {
+      // Calculate angle at the end of the curve
+      const midX = (startX + endX) / 2;
+      const midY = (startY + endY) / 2;
+      const controlX = midX - uy * curveOffset;
+      const controlY = midY + ux * curveOffset;
+      const tangentAngle = Math.atan2(endY - controlY, endX - controlX);
+      drawArrowHead(endX, endY, tangentAngle);
+    } else {
+      drawArrowHead(endX, endY, angleAB);
+    }
+    
+    // Draw weight label for weighted graphs
+    if (graphType === "weighted" && info.edgeAB) {
+      const weight = info.edgeAB.weight ?? 1;
+      const midX = (startX + endX) / 2;
+      const midY = (startY + endY) / 2;
+      if (shouldCurve) {
+        // Position label on the curve
+        const offsetX = -uy * (curveOffset + 0);
+        const offsetY = ux * (curveOffset + 0);
+        drawWeightLabel(midX + offsetX, midY + offsetY, weight);
+      } else {
+        const offsetX = -uy * 15;
+        const offsetY = ux * 15;
+        drawWeightLabel(midX + offsetX, midY + offsetY, weight);
+      }
+    }
+  }
+
+  if (info.hasBA) {
+    const isHighlighted = info.edgeBA && highlightEdges.includes(info.edgeBA.id);
+    const isVisited = info.edgeBA && visitedEdges.includes(info.edgeBA.id);
+
+    ctx.beginPath();
+    ctx.moveTo(endX, endY);
+
+    if (shouldCurve) {
+      // Draw curved line in opposite direction
+      const midX = (startX + endX) / 2;
+      const midY = (startY + endY) / 2;
+      // Control point on opposite side
+      const controlX = midX + uy * curveOffset;
+      const controlY = midY - ux * curveOffset;
+      ctx.quadraticCurveTo(controlX, controlY, startX, startY);
+    } else {
+      // Draw straight line
+      ctx.lineTo(startX, startY);
+    }
+
+    ctx.strokeStyle = isHighlighted
+      ? "#f97316"
+      : isVisited
+      ? "#22c55e"
+      : "#3b82f6";
+    ctx.lineWidth = isHighlighted ? 4 : isVisited ? 3.5 : 3;
+    ctx.stroke();
+
+    // Draw arrow head at the end
+    if (shouldCurve) {
+      // Calculate angle at the end of the curve
+      const midX = (startX + endX) / 2;
+      const midY = (startY + endY) / 2;
+      const controlX = midX + uy * curveOffset;
+      const controlY = midY - ux * curveOffset;
+      const tangentAngle = Math.atan2(startY - controlY, startX - controlX);
+      drawArrowHead(startX, startY, tangentAngle);
+    } else {
+      drawArrowHead(startX, startY, angleBA);
+    }
+    
+    // Draw weight label for weighted graphs
+    if (graphType === "weighted" && info.edgeBA) {
+      const weight = info.edgeBA.weight ?? 1;
+      const midX = (startX + endX) / 2;
+      const midY = (startY + endY) / 2;
+      if (shouldCurve) {
+        // Position label on the opposite curve
+        const offsetX = uy * (curveOffset + 0);
+        const offsetY = -ux * (curveOffset + 0);
+        drawWeightLabel(midX + offsetX, midY + offsetY, weight);
+      } else {
+        const offsetX = uy * 15;
+        const offsetY = -ux * 15;
+        drawWeightLabel(midX + offsetX, midY + offsetY, weight);
+      }
+    }
+  }
+});
+      } else {
+        // UNDIRECTED ONLY
+        edges.forEach((e) => {
+          const a = nodes.find((n) => n.id === e.from);
+          const b = nodes.find((n) => n.id === e.to);
+          if (!a || !b) return;
+
+          const dx = b.x - a.x;
+          const dy = b.y - a.y;
+          const len = Math.hypot(dx, dy) || 1;
+          const ux = dx / len;
+          const uy = dy / len;
+
+          const startX = a.x + ux * NODE_RADIUS;
+          const startY = a.y + uy * NODE_RADIUS;
+          const endX = b.x - ux * NODE_RADIUS;
+          const endY = b.y - uy * NODE_RADIUS;
+
+          const isHighlighted = highlightEdges.includes(e.id);
+          const isVisited = visitedEdges.includes(e.id);
+
+          ctx.beginPath();
+          ctx.moveTo(startX, startY);
+          ctx.lineTo(endX, endY);
+          ctx.strokeStyle = isHighlighted
+            ? "#f97316"
+            : isVisited
+            ? "#22c55e"
+            : "#3b82f6";
+          ctx.lineWidth = isHighlighted ? 4 : isVisited ? 3.5 : 3;
+          ctx.stroke();
+        });
+      }
 
     // ===== NODES =====
     nodes.forEach((n) => {
@@ -273,7 +372,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
 
   const edgeExists = (a: number, b: number) =>
     edges.some((e) =>
-      graphType === "directed"
+      graphType === "directed" || graphType === "weighted"
         ? e.from === a && e.to === b
         : (e.from === a && e.to === b) || (e.from === b && e.to === a)
     );
@@ -318,42 +417,95 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
   };
 
   const findWeightedEdgeLabelAt = (x: number, y: number): EdgeType | null => {
-    if (graphType !== "weighted") return null;
-    const canvas = canvasRef.current;
-    if (!canvas) return null;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return null;
+  if (graphType !== "weighted") return null;
+  const canvas = canvasRef.current;
+  if (!canvas) return null;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
 
-    ctx.font = "22px system-ui";
+  ctx.font = "22px system-ui";
 
-    for (const e of edges) {
-      const a = nodes.find((n) => n.id === e.from);
-      const b = nodes.find((n) => n.id === e.to);
-      if (!a || !b) continue;
+  // Build pair map to detect bidirectional edges
+  type PairInfo = {
+    aId: number;
+    bId: number;
+    hasAB: boolean;
+    hasBA: boolean;
+    edgeAB?: EdgeType;
+    edgeBA?: EdgeType;
+  };
 
-      const dx = b.x - a.x;
-      const dy = b.y - a.y;
-      const len = Math.hypot(dx, dy) || 1;
-      const ux = dx / len;
-      const uy = dy / len;
+  const pairMap = new Map<string, PairInfo>();
 
-      const startX = a.x + ux * NODE_RADIUS;
-      const startY = a.y + uy * NODE_RADIUS;
-      const endX = b.x - ux * NODE_RADIUS;
-      const endY = b.y - uy * NODE_RADIUS;
+  edges.forEach((e) => {
+    const aId = Math.min(e.from, e.to);
+    const bId = Math.max(e.from, e.to);
+    const key = `${aId}-${bId}`;
 
-      const midX = (startX + endX) / 2;
-      const midY = (startY + endY) / 2;
+    let info = pairMap.get(key);
+    if (!info) {
+      info = { aId, bId, hasAB: false, hasBA: false };
+    }
 
-      const weight = e.weight ?? 1;
+    if (e.from === aId && e.to === bId) {
+      info.hasAB = true;
+      info.edgeAB = e;
+    } else if (e.from === bId && e.to === aId) {
+      info.hasBA = true;
+      info.edgeBA = e;
+    }
+
+    pairMap.set(key, info);
+  });
+
+  const curveOffset = 20;
+
+  // Check each pair
+  for (const [, info] of pairMap) {
+    const a = nodes.find((n) => n.id === info.aId);
+    const b = nodes.find((n) => n.id === info.bId);
+    if (!a || !b) continue;
+
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+
+    const startX = a.x + ux * NODE_RADIUS;
+    const startY = a.y + uy * NODE_RADIUS;
+    const endX = b.x - ux * NODE_RADIUS;
+    const endY = b.y - uy * NODE_RADIUS;
+
+    const midX = (startX + endX) / 2;
+    const midY = (startY + endY) / 2;
+
+    const shouldCurve = info.hasAB && info.hasBA;
+
+    // Check edge AB
+    if (info.edgeAB) {
+      const weight = info.edgeAB.weight ?? 1;
       const label = String(weight);
       const paddingX = 8;
       const textWidth = ctx.measureText(label).width;
       const boxWidth = textWidth + paddingX * 2;
       const boxHeight = 30;
 
-      const boxX = midX - boxWidth / 2;
-      const boxY = midY - boxHeight / 2 - 8;
+      let labelX, labelY;
+      if (shouldCurve) {
+        const offsetX = -uy * (curveOffset + 20);
+        const offsetY = ux * (curveOffset + 20);
+        labelX = midX + offsetX;
+        labelY = midY + offsetY;
+      } else {
+        const offsetX = -uy * 15;
+        const offsetY = ux * 15;
+        labelX = midX + offsetX;
+        labelY = midY + offsetY;
+      }
+
+      const boxX = labelX - boxWidth / 2;
+      const boxY = labelY - boxHeight / 2 - 8;
 
       if (
         x >= boxX &&
@@ -361,12 +513,48 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
         y >= boxY &&
         y <= boxY + boxHeight
       ) {
-        return e;
+        return info.edgeAB;
       }
     }
 
-    return null;
-  };
+    // Check edge BA
+    if (info.edgeBA) {
+      const weight = info.edgeBA.weight ?? 1;
+      const label = String(weight);
+      const paddingX = 8;
+      const textWidth = ctx.measureText(label).width;
+      const boxWidth = textWidth + paddingX * 2;
+      const boxHeight = 30;
+
+      let labelX, labelY;
+      if (shouldCurve) {
+        const offsetX = uy * (curveOffset + 20);
+        const offsetY = -ux * (curveOffset + 20);
+        labelX = midX + offsetX;
+        labelY = midY + offsetY;
+      } else {
+        const offsetX = uy * 15;
+        const offsetY = -ux * 15;
+        labelX = midX + offsetX;
+        labelY = midY + offsetY;
+      }
+
+      const boxX = labelX - boxWidth / 2;
+      const boxY = labelY - boxHeight / 2 - 8;
+
+      if (
+        x >= boxX &&
+        x <= boxX + boxWidth &&
+        y >= boxY &&
+        y <= boxY + boxHeight
+      ) {
+        return info.edgeBA;
+      }
+    }
+  }
+
+  return null;
+};
 
   /*************************************************
    * MODAL – edit weight
