@@ -205,7 +205,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
 
         if (graphType === "weighted") {
           if(e.weight == null){
-            e.weight = 0;
+            e.weight = 1;
           }
           const midX = (startX + endX) / 2;
           const midY = (startY + endY) / 2;

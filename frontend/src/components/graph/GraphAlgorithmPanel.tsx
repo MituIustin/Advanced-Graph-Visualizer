@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { GraphType, NodeType, EdgeType } from "../../types/graph";
 import "../../styles/algorithm_panel.css";
 
@@ -37,17 +37,26 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
   edges,
   onHighlightChange,
 }) => {
-  const [algorithm, setAlgorithm] = useState<"bfs" | "dfs" | "kruskal">("bfs");
+  const [algorithm, setAlgorithm] = useState<"bfs" | "dfs" | "kruskal" | "dijkstra">("bfs");
+  const [startNodeId, setStartNodeId] = useState<number | null>(null);
   const [runId, setRunId] = useState<string | null>(null);
   const [totalSteps, setTotalSteps] = useState<number>(0);
   const [currentStep, setCurrentStep] = useState<number | null>(null);
   const [status, setStatus] = useState<string>("Idle");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const requiresWeighted = algorithm === "kruskal";
+  const requiresWeighted = (algorithm === "kruskal" || algorithm === "dijkstra");
   const isWeighted = graphType === "weighted" || graphType.includes("weighted");
+  const requiresStartNode = (algorithm === "dijkstra" || algorithm === "bfs" || algorithm === "dfs");
 
   const API_BASE = "http://localhost:8000";
+
+  // Update start node when nodes change or algorithm changes
+  useEffect(() => {
+    if (nodes.length > 0 && (startNodeId === null || !nodes.find(n => n.id === startNodeId))) {
+      setStartNodeId(nodes[0].id);
+    }
+  }, [nodes, startNodeId]);
 
   const resetHighlights = () => {
     onHighlightChange([], [], [], []);
@@ -107,7 +116,7 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
           to_node: e.to,
           weight: e.weight ?? null,
         })),
-        start_node_id: nodes[0]?.id ?? null,
+        start_node_id: startNodeId ?? nodes[0]?.id ?? null,
         target_node_id: null,
       };
 
@@ -161,8 +170,11 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
       <h3 className="algo-panel-title">Step-by-step visualization</h3>
       <p className="algo-panel-description">
       {algorithm === "kruskal" && !isWeighted
-        ? "Kruskal's algorithm requires a weighted graph."
-        : "Choose an algorithm and hit Run to display its steps on your created graph."}
+      ? "Kruskal's algorithm requires a weighted graph."
+      : algorithm === "dijkstra" && !isWeighted
+      ? "Dijkstra's algorithm requires a weighted graph with only positive weights."
+      : "Choose an algorithm and hit Run to display its steps on your created graph."
+      }
       </p>
 
       {/* Algorithm selector */}
@@ -171,13 +183,32 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
         <select
           className="algo-panel-select"
           value={algorithm}
-          onChange={(e) => setAlgorithm(e.target.value as "bfs" | "dfs" | "kruskal")}
+          onChange={(e) => setAlgorithm(e.target.value as "bfs" | "dfs" | "kruskal" | "dijkstra")}
         >
           <option value="bfs">BFS</option>
           <option value="dfs">DFS</option>
-          <option value="kruskal">KRUSKAL</option>
+          <option value="kruskal">Kruskal's algorithm</option>
+          <option value="dijkstra">Dijkstra's algorithm</option>
         </select>
       </div>
+
+      {/* Start node selector - shown for algorithms that need a start node */}
+      {requiresStartNode && nodes.length > 0 && (
+        <div className="algo-panel-selector-row">
+          <span>Start Node:</span>
+          <select
+            className="algo-panel-select"
+            value={startNodeId ?? ""}
+            onChange={(e) => setStartNodeId(Number(e.target.value))}
+          >
+            {nodes.map((node) => (
+              <option key={node.id} value={node.id}>
+                Node {node.id}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div className="algo-panel-button-row">
         <button
