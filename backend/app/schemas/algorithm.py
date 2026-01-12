@@ -13,6 +13,7 @@ class AlgorithmName(str, Enum):
     dijkstra = "dijkstra"
     kruskal = "kruskal"
     prim = "prim"
+    bellmanford = "bellmanford"
 
 class Node(BaseModel):
     id: int
