@@ -91,3 +91,15 @@
   box-shadow: 0 10px 25px rgba(37, 99, 235, 0.45);
   transform: translateY(-1px);
 }
+
+.graph-input-textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #1f2937;
+}
+
+.graph-input-apply-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #374151;
+}

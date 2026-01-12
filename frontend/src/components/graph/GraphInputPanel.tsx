@@ -9,6 +9,7 @@ interface Props {
   nodes: NodeType[];
   edges: EdgeType[];
   onGraphChange: (nodes: NodeType[], edges: EdgeType[]) => void;
+  isDisabled?: boolean;
 }
 
 const CANVAS_WIDTH = 900;
@@ -19,6 +20,7 @@ const GraphInputPanel: React.FC<Props> = ({
   nodes,
   edges,
   onGraphChange,
+  isDisabled = false,
 }) => {
   const [mode, setMode] = useState<InputMode>("adjacency-matrix");
   const [text, setText] = useState("");
@@ -410,6 +412,7 @@ const GraphInputPanel: React.FC<Props> = ({
         value={text}
         onChange={(e) => setText(e.target.value)}
         rows={10}
+        disabled={isDisabled}
         placeholder={
           mode === "adjacency-matrix"
             ? "Example matrix:\n0 1 0\n1 0 1\n0 1 0"
@@ -426,6 +429,7 @@ const GraphInputPanel: React.FC<Props> = ({
           type="button"
           className="graph-input-apply-button"
           onClick={handleApply}
+          disabled={isDisabled}
         >
           Apply to graph
         </button>

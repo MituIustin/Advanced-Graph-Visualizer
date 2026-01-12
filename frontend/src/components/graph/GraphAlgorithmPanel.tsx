@@ -12,6 +12,7 @@ interface Props {
     visitedNodes: number[],
     visitedEdges: number[]
   ) => void;
+  onRunningChange: (isRunning: boolean) => void;  // NEW
 }
 
 interface AlgorithmRunCreated {
@@ -36,6 +37,7 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
   nodes,
   edges,
   onHighlightChange,
+  onRunningChange,  // NEW
 }) => {
   const [algorithm, setAlgorithm] = useState<"bfs" | "dfs" | "kruskal" | "dijkstra">("bfs");
   const [startNodeId, setStartNodeId] = useState<number | null>(null);
@@ -45,13 +47,14 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
   const [status, setStatus] = useState<string>("Idle");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isRunning, setIsRunning] = useState<boolean>(false);  // NEW
+  
   const requiresWeighted = (algorithm === "kruskal" || algorithm === "dijkstra");
   const isWeighted = graphType === "weighted" || graphType.includes("weighted");
   const requiresStartNode = (algorithm === "dijkstra" || algorithm === "bfs" || algorithm === "dfs");
 
   const API_BASE = "http://localhost:8000";
 
-  // Update start node when nodes change or algorithm changes
   useEffect(() => {
     if (nodes.length > 0 && (startNodeId === null || !nodes.find(n => n.id === startNodeId))) {
       setStartNodeId(nodes[0].id);
@@ -105,6 +108,8 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
       setIsLoading(true);
       setError(null);
       resetHighlights();
+      setIsRunning(true);  // NEW
+      onRunningChange(true);  // NEW
 
       const body = {
         algorithm,
@@ -145,9 +150,23 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
       console.error(err);
       setError(err.message || "Error while starting algorithm.");
       setStatus("Error");
+      setIsRunning(false);  // NEW
+      onRunningChange(false);  // NEW
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // NEW
+  const handleFinish = () => {
+    setIsRunning(false);
+    onRunningChange(false);
+    resetHighlights();
+    setRunId(null);
+    setTotalSteps(0);
+    setCurrentStep(null);
+    setStatus("Idle");
+    setError(null);
   };
 
   const handleNext = async () => {
@@ -184,6 +203,7 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
           className="algo-panel-select"
           value={algorithm}
           onChange={(e) => setAlgorithm(e.target.value as "bfs" | "dfs" | "kruskal" | "dijkstra")}
+          disabled={isRunning}  // NEW
         >
           <option value="bfs">BFS</option>
           <option value="dfs">DFS</option>
@@ -192,7 +212,7 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
         </select>
       </div>
 
-      {/* Start node selector - shown for algorithms that need a start node */}
+      {/* Start node selector */}
       {requiresStartNode && nodes.length > 0 && (
         <div className="algo-panel-selector-row">
           <span>Start Node:</span>
@@ -200,6 +220,7 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
             className="algo-panel-select"
             value={startNodeId ?? ""}
             onChange={(e) => setStartNodeId(Number(e.target.value))}
+            disabled={isRunning}  // NEW
           >
             {nodes.map((node) => (
               <option key={node.id} value={node.id}>
@@ -213,11 +234,11 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
       <div className="algo-panel-button-row">
         <button
           type="button"
-          onClick={handleRunClick}
-          disabled={disableRun}
+          onClick={isRunning ? handleFinish : handleRunClick}  // MODIFIED
+          disabled={!isRunning && disableRun}  // MODIFIED
           className="algo-panel-run-button"
         >
-          {isLoading ? "Running..." : `Run ${algorithm.toUpperCase()}`}
+          {isLoading ? "Running..." : isRunning ? "Finish" : `Run ${algorithm.toUpperCase()}`}  {/* MODIFIED */}
         </button>
 
         <button

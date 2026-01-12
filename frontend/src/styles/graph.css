@@ -218,3 +218,13 @@
   color: #f97373;
   font-size: 12px;
 }
+
+.graph-type-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.graph-type-button.active:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -12,6 +12,7 @@ interface GraphCanvasProps {
   highlightEdges?: number[];
   visitedNodes?: number[];
   visitedEdges?: number[];
+  isDisabled?: boolean;  // NEW
 }
 
 const NODE_RADIUS = 25;
@@ -25,6 +26,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
   highlightEdges = [],
   visitedNodes = [],
   visitedEdges = [],
+  isDisabled = false,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [dragging, setDragging] = useState<number | null>(null);
@@ -403,6 +405,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
    * EVENTS
    *************************************************/
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (isDisabled) return;
     if (e.button !== 0) return;
 
     const { x, y } = getPos(e);
@@ -431,6 +434,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (isDisabled) return;
     if (dragging == null) return;
 
     const { x, y } = getPos(e);
@@ -445,6 +449,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
   };
 
   const handleDoubleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (isDisabled) return;
     const { x, y } = getPos(e);
 
     const labelEdge = findWeightedEdgeLabelAt(x, y);
@@ -477,6 +482,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
   };
 
   const handleContextMenu = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (isDisabled) return;
     e.preventDefault();
     const { x, y } = getPos(e);
 
@@ -512,7 +518,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
         ref={canvasRef}
         width={900}
         height={600}
-        className="graph-canvas"
+        className={`graph-canvas${isDisabled ? ' disabled' : ''}`}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}

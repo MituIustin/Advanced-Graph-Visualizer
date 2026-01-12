@@ -17,6 +17,7 @@ export default function GraphEditorPage() {
   const [highlightEdges, setHighlightEdges] = useState<number[]>([]);
   const [visitedNodes, setVisitedNodes] = useState<number[]>([]);
   const [visitedEdges, setVisitedEdges] = useState<number[]>([]);
+  const [isAlgorithmRunning, setIsAlgorithmRunning] = useState(false);
 
   const resetAlgorithmState = () => {
     setHighlightNodes([]);
@@ -198,6 +199,7 @@ export default function GraphEditorPage() {
             onGenerateRandom={handleGenerateRandom}
             onExportGraph={handleExportGraph}
             onImportGraph={handleImportGraph}
+            isDisabled={isAlgorithmRunning}
           />
         </div>
 
@@ -207,6 +209,7 @@ export default function GraphEditorPage() {
             <div className="graph-type-bar">
               <button
                 onClick={() => setGraphType("undirected")}
+                disabled={isAlgorithmRunning}
                 className={
                   graphType === "undirected"
                     ? "graph-type-button active"
@@ -217,6 +220,7 @@ export default function GraphEditorPage() {
               </button>
               <button
                 onClick={() => setGraphType("directed")}
+                disabled={isAlgorithmRunning}
                 className={
                   graphType === "directed"
                     ? "graph-type-button active"
@@ -227,6 +231,7 @@ export default function GraphEditorPage() {
               </button>
               <button
                 onClick={() => setGraphType("weighted")}
+                disabled={isAlgorithmRunning}
                 className={
                   graphType === "weighted"
                     ? "graph-type-button active"
@@ -246,6 +251,7 @@ export default function GraphEditorPage() {
               highlightEdges={highlightEdges}
               visitedNodes={visitedNodes}
               visitedEdges={visitedEdges}
+              isDisabled={isAlgorithmRunning}
             />
 
             <div className="canvas-instructions">
@@ -284,6 +290,7 @@ export default function GraphEditorPage() {
               setVisitedNodes(vNodes);
               setVisitedEdges(vEdges);
             }}
+            onRunningChange={setIsAlgorithmRunning}
           />
         </div>
       </div>

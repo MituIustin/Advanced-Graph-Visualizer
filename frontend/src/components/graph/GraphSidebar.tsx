@@ -18,6 +18,7 @@ interface Props {
     nodes: NodeType[],
     edges: EdgeType[]
   ) => void;
+  isDisabled?: boolean;
 }
 
 const GraphSidebar: React.FC<Props> = ({
@@ -30,6 +31,7 @@ const GraphSidebar: React.FC<Props> = ({
   onGenerateRandom,
   onExportGraph,
   onImportGraph,
+  isDisabled = false,
 }) => {
   const [importSource, setImportSource] = useState<ImportSource>("local");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -81,6 +83,7 @@ const GraphSidebar: React.FC<Props> = ({
         <select style={{fontSize:18}}
           value={inputMethod}
           onChange={(e) => onInputMethodChange(e.target.value as InputMethod)}
+          disabled={isDisabled}
         >
           <option value="text" style={{fontSize:18}}>Text</option>
           <option value="file" style={{fontSize:18}}>File import</option>
@@ -94,6 +97,7 @@ const GraphSidebar: React.FC<Props> = ({
           nodes={nodes}
           edges={edges}
           onGraphChange={onGraphChangeFromText}
+          isDisabled={isDisabled}
         />
       )}
 
