@@ -52,6 +52,7 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
   const requiresWeighted = (algorithm === "kruskal" || algorithm === "dijkstra");
   const isWeighted = graphType === "weighted" || graphType.includes("weighted");
   const requiresStartNode = (algorithm === "dijkstra" || algorithm === "bfs" || algorithm === "dfs");
+  const hasNegativeWeights = edges.some(e => e.weight != null && e.weight < 0);
 
   const API_BASE = "http://localhost:8000";
 
@@ -181,7 +182,9 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
     await loadStep(runId, currentStep - 1);
   };
 
-  const disableRun = isLoading || nodes.length === 0 || (requiresWeighted && !isWeighted);
+  const disableRun = isLoading || nodes.length === 0 || 
+                     (requiresWeighted && !isWeighted) ||
+                     (algorithm === "dijkstra" && hasNegativeWeights);
   const disableNav = !runId || totalSteps === 0 || isLoading;
 
   return (
@@ -192,6 +195,8 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
       ? "Kruskal's algorithm requires a weighted graph."
       : algorithm === "dijkstra" && !isWeighted
       ? "Dijkstra's algorithm requires a weighted graph with only positive weights."
+      : algorithm === "dijkstra" && hasNegativeWeights  // NEW
+      ? "Dijkstra's algorithm does not work with negative edge weights."  // NEW
       : "Choose an algorithm and hit Run to display its steps on your created graph."
       }
       </p>
