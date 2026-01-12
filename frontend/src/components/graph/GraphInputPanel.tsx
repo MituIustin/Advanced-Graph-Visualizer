@@ -128,11 +128,17 @@ const GraphInputPanel: React.FC<Props> = ({
       const j = index.get(e.to);
       if (i == null || j == null) return;
 
+      var val = 1;
+
+      if(graphType === "weighted" && e.weight !== undefined){
+        val = e.weight;
+      }
+
       if (graphType === "directed") {
-        matrix[i][j] = 1;
+        matrix[i][j] = val;
       } else {
-        matrix[i][j] = 1;
-        matrix[j][i] = 1;
+        matrix[i][j] = val;
+        matrix[j][i] = val;
       }
     });
 
