@@ -13,6 +13,7 @@ interface GraphCanvasProps {
   visitedNodes?: number[];
   visitedEdges?: number[];
   isDisabled?: boolean;  // NEW
+  selectedAlgorithm?: string;
 }
 
 const NODE_RADIUS = 25;
@@ -27,6 +28,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
   visitedNodes = [],
   visitedEdges = [],
   isDisabled = false,
+  selectedAlgorithm = "bfs",
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [dragging, setDragging] = useState<number | null>(null);
@@ -193,15 +195,21 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
 
     // Draw arrow head at the end
     if (shouldCurve) {
-      // Calculate angle at the end of the curve
       const midX = (startX + endX) / 2;
       const midY = (startY + endY) / 2;
       const controlX = midX - uy * curveOffset;
       const controlY = midY + ux * curveOffset;
       const tangentAngle = Math.atan2(endY - controlY, endX - controlX);
-      drawArrowHead(endX, endY, tangentAngle);
+      
+      // NEW: Only draw arrowhead if not Kruskal selected in weighted mode
+      if (!(graphType === "weighted" && selectedAlgorithm === "kruskal")) {
+        drawArrowHead(endX, endY, tangentAngle);
+      }
     } else {
-      drawArrowHead(endX, endY, angleAB);
+      // NEW: Only draw arrowhead if not Kruskal selected in weighted mode
+      if (!(graphType === "weighted" && selectedAlgorithm === "kruskal")) {
+        drawArrowHead(endX, endY, angleAB);
+      }
     }
     
     // Draw weight label for weighted graphs
@@ -252,15 +260,21 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
 
     // Draw arrow head at the end
     if (shouldCurve) {
-      // Calculate angle at the end of the curve
       const midX = (startX + endX) / 2;
       const midY = (startY + endY) / 2;
       const controlX = midX + uy * curveOffset;
       const controlY = midY - ux * curveOffset;
       const tangentAngle = Math.atan2(startY - controlY, startX - controlX);
-      drawArrowHead(startX, startY, tangentAngle);
+      
+      // NEW: Only draw arrowhead if not Kruskal selected in weighted mode
+      if (!(graphType === "weighted" && selectedAlgorithm === "kruskal")) {
+        drawArrowHead(startX, startY, tangentAngle);
+      }
     } else {
-      drawArrowHead(startX, startY, angleBA);
+      // NEW: Only draw arrowhead if not Kruskal selected in weighted mode
+      if (!(graphType === "weighted" && selectedAlgorithm === "kruskal")) {
+        drawArrowHead(startX, startY, angleBA);
+      }
     }
     
     // Draw weight label for weighted graphs
@@ -357,6 +371,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
     highlightEdges,
     visitedNodes,
     visitedEdges,
+    selectedAlgorithm,
   ]);
 
   /*************************************************
@@ -391,30 +406,138 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
   };
 
   const findEdgeAt = (x: number, y: number): EdgeType | null => {
-    const threshold = 6;
+  const threshold = 6;
+  const curveOffset = 40;
 
-    for (const e of edges) {
-      const a = nodes.find((n) => n.id === e.from);
-      const b = nodes.find((n) => n.id === e.to);
-      if (!a || !b) continue;
+  // Build pair map to detect bidirectional edges
+  type PairInfo = {
+    aId: number;
+    bId: number;
+    hasAB: boolean;
+    hasBA: boolean;
+    edgeAB?: EdgeType;
+    edgeBA?: EdgeType;
+  };
 
-      const dx = b.x - a.x;
-      const dy = b.y - a.y;
-      const lenSq = dx * dx + dy * dy;
-      if (lenSq === 0) continue;
+  const pairMap = new Map<string, PairInfo>();
 
-      const t = ((x - a.x) * dx + (y - a.y) * dy) / lenSq;
-      if (t < 0 || t > 1) continue;
+  edges.forEach((e) => {
+    const aId = Math.min(e.from, e.to);
+    const bId = Math.max(e.from, e.to);
+    const key = `${aId}-${bId}`;
 
-      const projX = a.x + t * dx;
-      const projY = a.y + t * dy;
-      const dist = Math.hypot(x - projX, y - projY);
-
-      if (dist <= threshold) return e;
+    let info = pairMap.get(key);
+    if (!info) {
+      info = { aId, bId, hasAB: false, hasBA: false };
     }
 
-    return null;
+    if (e.from === aId && e.to === bId) {
+      info.hasAB = true;
+      info.edgeAB = e;
+    } else if (e.from === bId && e.to === aId) {
+      info.hasBA = true;
+      info.edgeBA = e;
+    }
+
+    pairMap.set(key, info);
+  });
+
+  // Helper function to check distance to quadratic Bezier curve
+  const distanceToCurve = (
+    x: number,
+    y: number,
+    startX: number,
+    startY: number,
+    controlX: number,
+    controlY: number,
+    endX: number,
+    endY: number
+  ): number => {
+    let minDist = Infinity;
+    // Sample points along the curve
+    for (let t = 0; t <= 1; t += 0.05) {
+      const curveX = (1 - t) * (1 - t) * startX + 2 * (1 - t) * t * controlX + t * t * endX;
+      const curveY = (1 - t) * (1 - t) * startY + 2 * (1 - t) * t * controlY + t * t * endY;
+      const dist = Math.hypot(x - curveX, y - curveY);
+      minDist = Math.min(minDist, dist);
+    }
+    return minDist;
   };
+
+  // Check each pair for clicks
+  for (const [, info] of pairMap) {
+    const a = nodes.find((n) => n.id === info.aId);
+    const b = nodes.find((n) => n.id === info.bId);
+    if (!a || !b) continue;
+
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+
+    const startX = a.x + ux * NODE_RADIUS;
+    const startY = a.y + uy * NODE_RADIUS;
+    const endX = b.x - ux * NODE_RADIUS;
+    const endY = b.y - uy * NODE_RADIUS;
+
+    const shouldCurve = info.hasAB && info.hasBA;
+
+    // Check edge AB
+    if (info.edgeAB) {
+      if (shouldCurve) {
+        const midX = (startX + endX) / 2;
+        const midY = (startY + endY) / 2;
+        const controlX = midX - uy * curveOffset;
+        const controlY = midY + ux * curveOffset;
+        
+        const dist = distanceToCurve(x, y, startX, startY, controlX, controlY, endX, endY);
+        if (dist <= threshold) return info.edgeAB;
+      } else {
+        // Straight line check
+        const lenSq = dx * dx + dy * dy;
+        if (lenSq !== 0) {
+          const t = ((x - startX) * (endX - startX) + (y - startY) * (endY - startY)) / 
+                    ((endX - startX) * (endX - startX) + (endY - startY) * (endY - startY));
+          if (t >= 0 && t <= 1) {
+            const projX = startX + t * (endX - startX);
+            const projY = startY + t * (endY - startY);
+            const dist = Math.hypot(x - projX, y - projY);
+            if (dist <= threshold) return info.edgeAB;
+          }
+        }
+      }
+    }
+
+    // Check edge BA
+    if (info.edgeBA) {
+      if (shouldCurve) {
+        const midX = (startX + endX) / 2;
+        const midY = (startY + endY) / 2;
+        const controlX = midX + uy * curveOffset;
+        const controlY = midY - ux * curveOffset;
+        
+        const dist = distanceToCurve(x, y, endX, endY, controlX, controlY, startX, startY);
+        if (dist <= threshold) return info.edgeBA;
+      } else {
+        // Straight line check (reverse direction)
+        const lenSq = dx * dx + dy * dy;
+        if (lenSq !== 0) {
+          const t = ((x - endX) * (startX - endX) + (y - endY) * (startY - endY)) / 
+                    ((startX - endX) * (startX - endX) + (startY - endY) * (startY - endY));
+          if (t >= 0 && t <= 1) {
+            const projX = endX + t * (startX - endX);
+            const projY = endY + t * (startY - endY);
+            const dist = Math.hypot(x - projX, y - projY);
+            if (dist <= threshold) return info.edgeBA;
+          }
+        }
+      }
+    }
+  }
+
+  return null;
+};
 
   const findWeightedEdgeLabelAt = (x: number, y: number): EdgeType | null => {
   if (graphType !== "weighted") return null;

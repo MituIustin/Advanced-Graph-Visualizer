@@ -13,6 +13,7 @@ interface Props {
     visitedEdges: number[]
   ) => void;
   onRunningChange: (isRunning: boolean) => void;  // NEW
+  onAlgorithmChange: (algorithm: string) => void;
 }
 
 interface AlgorithmRunCreated {
@@ -38,6 +39,7 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
   edges,
   onHighlightChange,
   onRunningChange,  // NEW
+  onAlgorithmChange,
 }) => {
   const [algorithm, setAlgorithm] = useState<"bfs" | "dfs" | "kruskal" | "dijkstra">("bfs");
   const [startNodeId, setStartNodeId] = useState<number | null>(null);
@@ -53,6 +55,16 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
   const isWeighted = graphType === "weighted" || graphType.includes("weighted");
   const requiresStartNode = (algorithm === "dijkstra" || algorithm === "bfs" || algorithm === "dfs");
   const hasNegativeWeights = edges.some(e => e.weight != null && e.weight < 0);
+
+  const hasBidirectionalEdges = () => {
+    const edgeSet = new Set(edges.map(e => `${e.from}-${e.to}`));
+    return edges.some(e => edgeSet.has(`${e.to}-${e.from}`));
+  };
+
+  const handleAlgorithmChange = (newAlgorithm: "bfs" | "dfs" | "kruskal" | "dijkstra") => {
+    setAlgorithm(newAlgorithm);
+    onAlgorithmChange(newAlgorithm);
+  };
 
   const API_BASE = "http://localhost:8000";
 
@@ -184,19 +196,22 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
 
   const disableRun = isLoading || nodes.length === 0 || 
                      (requiresWeighted && !isWeighted) ||
-                     (algorithm === "dijkstra" && hasNegativeWeights);
-  const disableNav = !runId || totalSteps === 0 || isLoading;
+                     (algorithm === "dijkstra" && hasNegativeWeights) ||
+                     (algorithm === "kruskal" && hasBidirectionalEdges());  // NEW
 
+  const disableNav = !runId || totalSteps === 0 || isLoading;
   return (
     <div className="algo-section">
       <h3 className="algo-panel-title">Step-by-step visualization</h3>
       <p className="algo-panel-description">
       {algorithm === "kruskal" && !isWeighted
       ? "Kruskal's algorithm requires a weighted graph."
+      : algorithm === "kruskal" && hasBidirectionalEdges()  // NEW
+      ? "Kruskal's algorithm requires undirected edges. Remove one direction from each bidirectional edge pair."  // NEW
       : algorithm === "dijkstra" && !isWeighted
       ? "Dijkstra's algorithm requires a weighted graph with only positive weights."
-      : algorithm === "dijkstra" && hasNegativeWeights  // NEW
-      ? "Dijkstra's algorithm does not work with negative edge weights."  // NEW
+      : algorithm === "dijkstra" && hasNegativeWeights
+      ? "Dijkstra's algorithm does not work with negative edge weights."
       : "Choose an algorithm and hit Run to display its steps on your created graph."
       }
       </p>
@@ -207,7 +222,7 @@ const GraphAlgorithmPanel: React.FC<Props> = ({
         <select
           className="algo-panel-select"
           value={algorithm}
-          onChange={(e) => setAlgorithm(e.target.value as "bfs" | "dfs" | "kruskal" | "dijkstra")}
+          onChange={(e) => handleAlgorithmChange(e.target.value as "bfs" | "dfs" | "kruskal" | "dijkstra")}
           disabled={isRunning}  // NEW
         >
           <option value="bfs">BFS</option>

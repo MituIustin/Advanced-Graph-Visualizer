@@ -18,6 +18,7 @@ export default function GraphEditorPage() {
   const [visitedNodes, setVisitedNodes] = useState<number[]>([]);
   const [visitedEdges, setVisitedEdges] = useState<number[]>([]);
   const [isAlgorithmRunning, setIsAlgorithmRunning] = useState(false);
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState<string>("bfs");
 
   const resetAlgorithmState = () => {
     setHighlightNodes([]);
@@ -252,6 +253,7 @@ export default function GraphEditorPage() {
               visitedNodes={visitedNodes}
               visitedEdges={visitedEdges}
               isDisabled={isAlgorithmRunning}
+              selectedAlgorithm={selectedAlgorithm}  // NEW
             />
 
             <div className="canvas-instructions">
@@ -291,6 +293,7 @@ export default function GraphEditorPage() {
               setVisitedEdges(vEdges);
             }}
             onRunningChange={setIsAlgorithmRunning}
+            onAlgorithmChange={setSelectedAlgorithm}
           />
         </div>
       </div>
