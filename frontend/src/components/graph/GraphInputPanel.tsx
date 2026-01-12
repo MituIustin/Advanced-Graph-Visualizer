@@ -10,6 +10,7 @@ interface Props {
   edges: EdgeType[];
   onGraphChange: (nodes: NodeType[], edges: EdgeType[]) => void;
   isDisabled?: boolean;
+  selectedAlgorithm?: string;  // NEW
 }
 
 const CANVAS_WIDTH = 900;
@@ -21,6 +22,7 @@ const GraphInputPanel: React.FC<Props> = ({
   edges,
   onGraphChange,
   isDisabled = false,
+  selectedAlgorithm = "bfs",  // NEW
 }) => {
   const [mode, setMode] = useState<InputMode>("adjacency-matrix");
   const [text, setText] = useState("");
@@ -47,31 +49,47 @@ const GraphInputPanel: React.FC<Props> = ({
    * GRAPH -> TEXT (auto, when visual changes)
    *************************************************/
   const graphToText = (
-    mode: InputMode,
-    nodes: NodeType[],
-    edges: EdgeType[],
-    graphType: GraphType
-  ): string => {
-    if (nodes.length === 0) return "";
+  mode: InputMode,
+  nodes: NodeType[],
+  edges: EdgeType[],
+  graphType: GraphType
+): string => {
+  if (nodes.length === 0) return "";
 
-    const ids = [...new Set(nodes.map((n) => n.id))].sort((a, b) => a - b);
+  const ids = [...new Set(nodes.map((n) => n.id))].sort((a, b) => a - b);
 
-    if (mode === "edge-list") {
-      const lines: string[] = [];
+  // NEW: Treat as undirected when Kruskal is selected in weighted mode
+  const treatAsUndirected = graphType === "weighted" && selectedAlgorithm === "kruskal";
 
-      const hasEdge = new Set<number>();
+  if (mode === "edge-list") {
+    const lines: string[] = [];
+
+    const hasEdge = new Set<number>();
+    edges.forEach((e) => {
+      hasEdge.add(e.from);
+      hasEdge.add(e.to);
+    });
+
+    // isolated nodes -> single number per line
+    ids.forEach((id) => {
+      if (!hasEdge.has(id)) {
+        lines.push(String(id));
+      }
+    });
+
+    // NEW: For Kruskal, show only one direction per edge pair
+    if (treatAsUndirected) {
+      const seen = new Set<string>();
       edges.forEach((e) => {
-        hasEdge.add(e.from);
-        hasEdge.add(e.to);
-      });
-
-      // isolated nodes -> single number per line
-      ids.forEach((id) => {
-        if (!hasEdge.has(id)) {
-          lines.push(String(id));
+        const key = `${Math.min(e.from, e.to)}-${Math.max(e.from, e.to)}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          if (e.weight != null) {
+            lines.push(`${e.from} ${e.to} ${e.weight}`);
+          }
         }
       });
-
+    } else {
       // edges
       edges.forEach((e) => {
         if (graphType === "weighted" && e.weight != null) {
@@ -80,78 +98,79 @@ const GraphInputPanel: React.FC<Props> = ({
           lines.push(`${e.from} ${e.to}`);
         }
       });
-
-      return lines.join("\n");
     }
 
-    if (mode === "adjacency-list") {
-      const neighborsMap = new Map<number, Set<number>>();
-      ids.forEach((id) => neighborsMap.set(id, new Set()));
+    return lines.join("\n");
+  }
 
-      edges.forEach((e) => {
-        const from = e.from;
-        const to = e.to;
-
-        if (!neighborsMap.has(from)) neighborsMap.set(from, new Set());
-        if (!neighborsMap.has(to)) neighborsMap.set(to, new Set());
-
-        if (graphType === "directed" || graphType === "weighted") {
-          neighborsMap.get(from)!.add(to);
-        } else {
-          neighborsMap.get(from)!.add(to);
-          neighborsMap.get(to)!.add(from);
-        }
-      });
-
-      const lines: string[] = [];
-      ids.forEach((id) => {
-        const neigh = Array.from(neighborsMap.get(id) ?? []).sort(
-          (a, b) => a - b
-        );
-        if (neigh.length === 0) {
-          lines.push(`${id}:`);
-        } else {
-          lines.push(`${id}: ${neigh.join(" ")}`);
-        }
-      });
-
-      return lines.join("\n");
-    }
-
-    // adjacency-matrix
-    const index = new Map<number, number>();
-    ids.forEach((id, i) => index.set(id, i));
-
-    const n = ids.length;
-    const matrix = Array.from({ length: n }, () => Array(n).fill(0));
+  if (mode === "adjacency-list") {
+    const neighborsMap = new Map<number, Set<number>>();
+    ids.forEach((id) => neighborsMap.set(id, new Set()));
 
     edges.forEach((e) => {
-      const i = index.get(e.from);
-      const j = index.get(e.to);
-      if (i == null || j == null) return;
+      const from = e.from;
+      const to = e.to;
 
-      var val = 1;
+      if (!neighborsMap.has(from)) neighborsMap.set(from, new Set());
+      if (!neighborsMap.has(to)) neighborsMap.set(to, new Set());
 
-      if(graphType === "weighted" && e.weight !== undefined){
-        val = e.weight;
-      }
-
-      if (graphType === "directed" || graphType === "weighted") {
-        matrix[i][j] = val;
+      if (graphType === "directed" || (graphType === "weighted" && !treatAsUndirected)) {  // MODIFIED
+        neighborsMap.get(from)!.add(to);
       } else {
-        matrix[i][j] = val;
-        matrix[j][i] = val;
+        neighborsMap.get(from)!.add(to);
+        neighborsMap.get(to)!.add(from);
       }
     });
 
-    return matrix.map((row) => row.join(" ")).join("\n");
-  };
+    const lines: string[] = [];
+    ids.forEach((id) => {
+      const neigh = Array.from(neighborsMap.get(id) ?? []).sort(
+        (a, b) => a - b
+      );
+      if (neigh.length === 0) {
+        lines.push(`${id}:`);
+      } else {
+        lines.push(`${id}: ${neigh.join(" ")}`);
+      }
+    });
+
+    return lines.join("\n");
+  }
+
+  // adjacency-matrix
+  const index = new Map<number, number>();
+  ids.forEach((id, i) => index.set(id, i));
+
+  const n = ids.length;
+  const matrix = Array.from({ length: n }, () => Array(n).fill(0));
+
+  edges.forEach((e) => {
+    const i = index.get(e.from);
+    const j = index.get(e.to);
+    if (i == null || j == null) return;
+
+    var val = 1;
+
+    if(graphType === "weighted" && e.weight !== undefined){
+      val = e.weight;
+    }
+
+    if (graphType === "directed" || (graphType === "weighted" && !treatAsUndirected)) {  // MODIFIED
+      matrix[i][j] = val;
+    } else {
+      matrix[i][j] = val;
+      matrix[j][i] = val;
+    }
+  });
+
+  return matrix.map((row) => row.join(" ")).join("\n");
+};
 
   useEffect(() => {
     const newText = graphToText(mode, nodes, edges, graphType);
     setText(newText);
     setError(null);
-  }, [mode, nodes, edges, graphType]);
+  }, [mode, nodes, edges, graphType, selectedAlgorithm]);
 
   /*************************************************
    * TEXT -> GRAPH (when click on Apply to graph)

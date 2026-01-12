@@ -19,6 +19,7 @@ interface Props {
     edges: EdgeType[]
   ) => void;
   isDisabled?: boolean;
+  selectedAlgorithm?: string;  // ADD THIS
 }
 
 const GraphSidebar: React.FC<Props> = ({
@@ -32,6 +33,7 @@ const GraphSidebar: React.FC<Props> = ({
   onExportGraph,
   onImportGraph,
   isDisabled = false,
+  selectedAlgorithm = "bfs",  // ADD THIS
 }) => {
   const [importSource, setImportSource] = useState<ImportSource>("local");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -98,6 +100,7 @@ const GraphSidebar: React.FC<Props> = ({
           edges={edges}
           onGraphChange={onGraphChangeFromText}
           isDisabled={isDisabled}
+          selectedAlgorithm={selectedAlgorithm}
         />
       )}
 

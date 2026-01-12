@@ -201,6 +201,7 @@ export default function GraphEditorPage() {
             onExportGraph={handleExportGraph}
             onImportGraph={handleImportGraph}
             isDisabled={isAlgorithmRunning}
+            selectedAlgorithm={selectedAlgorithm}
           />
         </div>
 
