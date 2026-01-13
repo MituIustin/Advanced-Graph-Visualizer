@@ -18,6 +18,8 @@ interface GraphCanvasProps {
 
 const NODE_RADIUS = 25;
 
+
+
 const GraphCanvas: React.FC<GraphCanvasProps> = ({
   nodes,
   edges,
@@ -39,7 +41,11 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
     null
   );
   const [weightModalValue, setWeightModalValue] = useState<string>("");
+  const scaleRef = useRef(1);
+  const offsetRef = useRef({ x: 0, y: 0 });
 
+  const isPanningRef = useRef(false);
+  const lastPanPosRef = useRef({ x: 0, y: 0 });
   /*************************************************
    * DRAW
    *************************************************/
@@ -49,8 +55,16 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);  
+    ctx.setTransform(
+      scaleRef.current,
+      0,
+      0,
+      scaleRef.current,
+      offsetRef.current.x,
+      offsetRef.current.y
+    );
 
     const drawArrowHead = (x: number, y: number, angle: number) => {
       const arrowLength = 12;
@@ -378,9 +392,20 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
    * UTILS
    *************************************************/
   const getPos = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const rect = canvasRef.current!.getBoundingClientRect();
-    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    const canvas = canvasRef.current!;
+    const rect = canvas.getBoundingClientRect();
+
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const pos = screenToWorld((e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY);
+    return pos;
   };
+
+  const screenToWorld = (x: number, y: number) => ({
+  x: (x - offsetRef.current.x) / scaleRef.current,
+  y: (y - offsetRef.current.y) / scaleRef.current,
+  });
 
   const findNodeAt = (x: number, y: number): NodeType | null =>
     nodes.find((n) => Math.hypot(n.x - x, n.y - y) <= NODE_RADIUS) ?? null;
@@ -715,38 +740,84 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
   /*************************************************
    * EVENTS
    *************************************************/
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (isDisabled) return;
-    if (e.button !== 0) return;
+const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  if (e.button === 1) { // middle mouse
+    isPanningRef.current = true;
+    lastPanPosRef.current = { x: e.clientX, y: e.clientY };
+    return;
+  } 
+  if (isDisabled) return;  
 
-    const { x, y } = getPos(e);
-    const node = findNodeAt(x, y);
+  if (e.button !== 0) return;
 
-    if (node) {
-      setDragging(node.id);
-      setOffset({ x: x - node.x, y: y - node.y });
-      return;
-    }
+  const { x, y } = getPos(e);
+  const node = findNodeAt(x, y);
 
-    if (graphType === "weighted") {
-      const labelEdge = findWeightedEdgeLabelAt(x, y);
-      if (labelEdge) return;
-    }
+  if (node) {
+    setDragging(node.id);
+    setOffset({ x: x - node.x, y: y - node.y });
+    return;
+  }
 
-    const edge = findEdgeAt(x, y);
-    if (edge) return;
+  if (graphType === "weighted") {
+    const labelEdge = findWeightedEdgeLabelAt(x, y);
+    if (labelEdge) return;
+  }
 
-    const newId = nodes.length
-      ? Math.max(...nodes.map((n) => n.id)) + 1
-      : 1;
-    const newNodes: NodeType[] = [...nodes, { id: newId, x, y }];
-    onGraphChange(newNodes, edges);
-    setSelectedForEdge(null);
+  const edge = findEdgeAt(x, y);
+  if (edge) return;
+
+  // FIXED: use world coordinates directly
+  const pos = getPos(e);
+  const newId = nodes.length ? Math.max(...nodes.map((n) => n.id)) + 1 : 1;
+  const newNodes: NodeType[] = [...nodes, { id: newId, x: pos.x, y: pos.y }];
+  onGraphChange(newNodes, edges);
+  setSelectedForEdge(null);
+};
+
+
+ const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left; // screen coords
+    const mouseY = e.clientY - rect.top;
+
+    const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+    const newScale = Math.min(Math.max(scaleRef.current * zoomFactor, 0.2), 5);
+
+    // Compute mouse position in world coordinates **before zoom**
+    const worldX = (mouseX - offsetRef.current.x) / scaleRef.current;
+    const worldY = (mouseY - offsetRef.current.y) / scaleRef.current;
+
+    scaleRef.current = newScale;
+
+    // Adjust offset so zoom centers on cursor
+    offsetRef.current.x = mouseX - worldX * scaleRef.current;
+    offsetRef.current.y = mouseY - worldY * scaleRef.current;
+
+    draw();
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+      if (isPanningRef.current) {
+        const dx = e.clientX - lastPanPosRef.current.x;
+        const dy = e.clientY - lastPanPosRef.current.y;
+
+        offsetRef.current.x += dx;
+        offsetRef.current.y += dy;
+
+        lastPanPosRef.current = { x: e.clientX, y: e.clientY };
+        draw();
+        return;
+      }
     if (isDisabled) return;
-    if (dragging == null) return;
+
+    if (dragging == null) return;  
+    
 
     const { x, y } = getPos(e);
     const newNodes: NodeType[] = nodes.map((n) =>
@@ -756,6 +827,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
   };
 
   const handleMouseUp = () => {
+    isPanningRef.current = false;
     setDragging(null);
   };
 
@@ -835,6 +907,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({
         onMouseUp={handleMouseUp}
         onDoubleClick={handleDoubleClick}
         onContextMenu={handleContextMenu}
+        onWheel={handleWheel}
       />
 
       {weightModalEdgeId != null && (

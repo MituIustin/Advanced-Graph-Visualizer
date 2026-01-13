@@ -180,13 +180,6 @@ export default function GraphEditorPage() {
 
   return (
     <div className="page">
-      <nav className="navbar">
-        <div>Advanced Graph Visualizer</div>
-        <button onClick={() => alert("Account page (coming soon)")}>
-          Account
-        </button>
-      </nav>
-
       <div className="layout">
         {/* LEFT – sidebar (text/file/random + export/import) */}
         <div className="panel panel-left">
@@ -270,6 +263,12 @@ export default function GraphEditorPage() {
               <div>
                 <span>Double click</span> on a weight (weighted graph) to edit
                 it.
+              </div>
+              <div>
+                <span>Hold and move the Mouse Wheel</span> to move the graph.
+              </div>
+              <div>
+                <span>Mouse Wheel Up and Down</span> zoom in or out.
               </div>
             </div>
           </div>
