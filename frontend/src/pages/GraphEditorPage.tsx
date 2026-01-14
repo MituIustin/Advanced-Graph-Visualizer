@@ -178,6 +178,22 @@ export default function GraphEditorPage() {
     resetAlgorithmState();
   };
 
+  const handleSetGraphType = (newType: GraphType) => {
+  setGraphType(newType);
+
+  if (newType === "weighted") {
+    setEdges((prevEdges) =>
+      prevEdges.map((e) => ({
+        ...e,
+        weight: e.weight ?? 1,
+      }))
+    );
+  }
+
+  resetAlgorithmState();
+};
+
+
   return (
     <div className="page">
       <div className="layout">
@@ -203,7 +219,7 @@ export default function GraphEditorPage() {
           <div className="graph-canvas-wrapper">
             <div className="graph-type-bar">
               <button
-                onClick={() => setGraphType("undirected")}
+                onClick={() => handleSetGraphType("undirected")}
                 disabled={isAlgorithmRunning}
                 className={
                   graphType === "undirected"
@@ -213,8 +229,9 @@ export default function GraphEditorPage() {
               >
                 Undirected
               </button>
+
               <button
-                onClick={() => setGraphType("directed")}
+                onClick={() => handleSetGraphType("directed")}
                 disabled={isAlgorithmRunning}
                 className={
                   graphType === "directed"
@@ -224,8 +241,9 @@ export default function GraphEditorPage() {
               >
                 Directed
               </button>
+
               <button
-                onClick={() => setGraphType("weighted")}
+                onClick={() => handleSetGraphType("weighted")}
                 disabled={isAlgorithmRunning}
                 className={
                   graphType === "weighted"
